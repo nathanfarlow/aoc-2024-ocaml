@@ -19,7 +19,7 @@ module Part1 = struct
 end
 
 module Part2 = struct
-  let drop_each =
+  let drop_one =
     let rec aux prev = function
       | [] -> []
       | hd :: tl -> (prev @ tl) :: aux (prev @ [ hd ]) tl
@@ -28,7 +28,7 @@ module Part2 = struct
 
   let f reports =
     List.map reports ~f:(fun report ->
-        List.exists (drop_each report) ~f:report_is_safe)
+        List.exists (drop_one report) ~f:report_is_safe)
     |> sum ~f:Bool.to_int |> print_int
 end
 
