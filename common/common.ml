@@ -7,7 +7,7 @@ let ( >> ) f g x = g (f x)
 let space = take_while (function ' ' | '\t' -> true | _ -> false)
 let integer = take_while1 Char.is_digit >>| Int.of_string
 let eol = string "\n" >>| ignore
-let parse parser s = parse_string ~consume:All parser s |> Result.ok_or_failwith
+let exec parser s = parse_string ~consume:All parser s |> Result.ok_or_failwith
 
 let run_with_input_file ~part1 ~part2 ~parse =
   Command.basic ~summary:"Advent of code"

@@ -9,18 +9,18 @@ let part1 [ l1; l2 ] =
   |> printf "%d\n"
 
 let part2 [ l1; l2 ] =
-  let l2 =
-    List.map l2 ~f:(fun x -> (x, ()))
-    |> Map.of_alist_multi (module Int)
-    |> Map.map ~f:List.length
+  let occurences =
+    List.sort_and_group ~compare:Int.compare l2
+    |> List.map ~f:(fun l -> (List.hd_exn l, List.length l))
+    |> Map.of_alist_exn (module Int)
   in
   List.sum
     (module Int)
-    ~f:(fun x -> match Map.find l2 x with None -> 0 | Some n -> x * n)
+    ~f:(fun x -> match Map.find occurences x with None -> 0 | Some n -> x * n)
     l1
   |> printf "%d\n"
 
 let parse =
-  many (many_till (integer <* space) eol) >>| List.transpose_exn |> parse
+  many (many_till (integer <* space) eol) >>| List.transpose_exn |> exec
 
 let () = run_with_input_file ~part1 ~part2 ~parse
