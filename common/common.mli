@@ -6,7 +6,8 @@ val ( >> ) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c
 val space : string Angstrom.t
 val integer : int Angstrom.t
 val eol : unit Angstrom.t
-val exec : 'a Angstrom.t -> string -> 'a
+val skip_till : 'a Angstrom.t -> 'a Angstrom.t
+val exec : ?consume:Angstrom.Consume.t -> 'a Angstrom.t -> string -> 'a
 val zip_next : 'a list -> ('a * 'a) list
 val sum : f:('a -> int) -> 'a list -> int
 val print_int : int -> unit

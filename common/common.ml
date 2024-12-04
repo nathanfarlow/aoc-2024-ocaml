@@ -7,7 +7,24 @@ let ( >> ) f g x = g (f x)
 let space = take_while (function ' ' | '\t' -> true | _ -> false)
 let integer = take_while1 Char.is_digit >>| Int.of_string
 let eol = string "\n" >>| ignore
-let exec parser s = parse_string ~consume:All parser s |> Result.ok_or_failwith
+
+let exec ?(consume = Angstrom.Consume.All) parser s =
+  parse_string ~consume parser s |> Result.ok_or_failwith
+
+let skip_till p = fix (fun m -> p <|> any_char *> m)
+
+let parse =
+  let mul =
+    lift2
+      (fun a b -> (a, b))
+      (string "mul(" *> integer <* string ",")
+      (integer <* string ")")
+  in
+  many (skip_till mul) |> exec ~consume:Prefix
+
+let%expect_test "" =
+  parse "  mul(1,2) mul(3,4)  " |> [%sexp_of: (int * int) list] |> print_s;
+  [%expect {| ((1 2) (3 4)) |}]
 
 let zip_next l =
   let rec aux acc = function
