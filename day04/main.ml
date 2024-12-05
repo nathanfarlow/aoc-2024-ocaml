@@ -7,6 +7,7 @@ let count_all s parsers =
       let sub = String.drop_prefix s i in
       List.filter_map parsers ~f:(fun p -> exec_opt ~consume:Prefix p sub))
   |> List.sum (module Int) ~f:List.length
+  |> print_int
 
 let part1 (s, width) =
   List.cartesian_product [ "XMAS"; "SAMX" ] [ 0; width - 1; width; width + 1 ]
@@ -15,11 +16,10 @@ let part1 (s, width) =
          |> List.map ~f:(fun c -> char c >>| ignore)
          |> List.intersperse ~sep:(take n >>| ignore)
          |> List.reduce_exn ~f:( *> ))
-  |> count_all s |> print_int
+  |> count_all s
 
 let part2 (s, width) =
-  let a = [ ('M', 'S'); ('S', 'M') ] in
-  List.cartesian_product a a
+  List.cartesian_product [ ('M', 'S'); ('S', 'M') ] [ ('M', 'S'); ('S', 'M') ]
   |> List.map ~f:(fun ((tl, br), (tr, bl)) ->
          [
            char tl *> any_char *> char tr;
@@ -29,7 +29,7 @@ let part2 (s, width) =
          |> List.map ~f:(map ~f:ignore)
          |> List.intersperse ~sep:(take (width - 2) >>| ignore)
          |> List.reduce_exn ~f:( *> ))
-  |> count_all s |> print_int
+  |> count_all s
 
 let parse s =
   (s, exec (many_till any_char end_of_line) s ~consume:Prefix |> List.length)
