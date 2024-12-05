@@ -11,6 +11,9 @@ let eol = string "\n" >>| ignore
 let exec ?(consume = Angstrom.Consume.All) parser s =
   parse_string ~consume parser s |> Result.ok_or_failwith
 
+let exec_opt ?consume parser s =
+  match exec ?consume parser s with x -> Some x | exception _ -> None
+
 let skip_till p = fix (fun m -> p <|> any_char *> m)
 
 let zip_next l =

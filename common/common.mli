@@ -8,6 +8,10 @@ val integer : int Angstrom.t
 val eol : unit Angstrom.t
 val skip_till : 'a Angstrom.t -> 'a Angstrom.t
 val exec : ?consume:Angstrom.Consume.t -> 'a Angstrom.t -> string -> 'a
+
+val exec_opt :
+  ?consume:Angstrom.Consume.t -> 'a Angstrom.t -> string -> 'a option
+
 val zip_next : 'a list -> ('a * 'a) list
 val sum : f:('a -> int) -> 'a list -> int
 val print_int : int -> unit
