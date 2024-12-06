@@ -4,12 +4,14 @@ include Option.Let_syntax
 open Angstrom
 
 let ( >> ) f g x = g (f x)
-let space = take_while (function ' ' | '\t' -> true | _ -> false)
+let space = skip_while (function ' ' | '\t' -> true | _ -> false)
 let integer = take_while1 Char.is_digit >>| Int.of_string
 let eol = string "\n" >>| ignore
 
 let exec ?(consume = Angstrom.Consume.All) parser s =
   parse_string ~consume parser s |> Result.ok_or_failwith
+
+let ws = skip_while Char.is_whitespace
 
 let exec_opt ?consume parser s =
   match exec ?consume parser s with x -> Some x | exception _ -> None

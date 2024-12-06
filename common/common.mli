@@ -3,11 +3,12 @@ module Math = Math
 include module type of Option.Let_syntax
 
 val ( >> ) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c
-val space : string Angstrom.t
+val space : unit Angstrom.t
 val integer : int Angstrom.t
 val eol : unit Angstrom.t
 val skip_till : 'a Angstrom.t -> 'a Angstrom.t
 val exec : ?consume:Angstrom.Consume.t -> 'a Angstrom.t -> string -> 'a
+val ws : unit Angstrom.t
 
 val exec_opt :
   ?consume:Angstrom.Consume.t -> 'a Angstrom.t -> string -> 'a option
