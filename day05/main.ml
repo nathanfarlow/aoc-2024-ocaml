@@ -1,14 +1,17 @@
 open! Core
 open! Common
 
+let violates_rule rules left right =
+  match Map.find rules left with
+  | None -> false
+  | Some ys -> not (Set.mem ys right)
+
 let sort rules arr =
   let arr = Array.copy arr in
   for _ = 0 to Array.length arr - 1 do
     for i = 0 to Array.length arr - 1 do
       for j = i + 1 to Array.length arr - 1 do
-        match Map.find rules arr.(j) with
-        | None -> ()
-        | Some ys -> if Set.mem ys arr.(i) then Array.swap arr i j
+        if violates_rule rules arr.(i) arr.(j) then Array.swap arr i j
       done
     done
   done;
