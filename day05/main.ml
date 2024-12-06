@@ -2,9 +2,7 @@ open! Core
 open! Common
 
 let violates_rule rules left right =
-  match Map.find rules left with
-  | None -> false
-  | Some ys -> not (Set.mem ys right)
+  match Map.find rules right with None -> false | Some xs -> Set.mem xs left
 
 let sort rules arr =
   let arr = Array.copy arr in
