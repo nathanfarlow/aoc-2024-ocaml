@@ -1,38 +1,40 @@
 open! Core
 open! Common
-open! Angstrom
 
-let is_update_good rules l =
-  let is_first_elem_good = function
-    | x :: xs ->
-        List.for_all xs ~f:(fun y ->
-            match Map.find rules y with
-            | None -> true
-            | Some ys -> not (Set.mem ys x))
-  in
-  List.init (List.length l) ~f:(List.drop l)
-  |> List.for_all ~f:is_first_elem_good
+let sort rules arr =
+  let arr = Array.copy arr in
+  for _ = 0 to Array.length arr - 1 do
+    for i = 0 to Array.length arr - 1 do
+      for j = i + 1 to Array.length arr - 1 do
+        match Map.find rules arr.(j) with
+        | None -> ()
+        | Some ys -> if Set.mem ys arr.(i) then Array.swap arr i j
+      done
+    done
+  done;
+  arr
 
-let part1 (pairs, updates) =
-  let rules =
-    Map.of_alist_multi (module Int) pairs
-    |> Map.map ~f:(Set.of_list (module Int))
-  in
-  List.filter updates ~f:(is_update_good rules)
-  |> List.sum
-       (module Int)
-       ~f:(fun l ->
-         let len = List.length l in
-         List.nth_exn l (len / 2))
-  |> print_int
+let is_update_good rules arr = Array.equal Int.equal arr (sort rules arr)
 
-let part2 _ = failwith ""
+let sum_and_print =
+  List.sum (module Int) ~f:(fun arr -> arr.(Array.length arr / 2)) >> print_int
+
+let part1 (rules, updates) =
+  List.filter updates ~f:(is_update_good rules) |> sum_and_print
+
+let part2 (rules, updates) =
+  List.filter updates ~f:(Fn.non (is_update_good rules))
+  |> List.map ~f:(sort rules)
+  |> sum_and_print
 
 let parse =
-  let pairs =
+  let open Angstrom in
+  let rules =
     sep_by1 eol (sep_by1 (char '|') integer >>| function [ a; b ] -> (a, b))
+    >>| Map.of_alist_multi (module Int)
+    >>| Map.map ~f:(Set.of_list (module Int))
   in
-  let updates = sep_by1 eol (sep_by1 (char ',') integer) in
-  lift2 Tuple2.create pairs (ws *> updates) |> exec ~consume:Prefix
+  let updates = sep_by1 eol (sep_by1 (char ',') integer >>| Array.of_list) in
+  lift2 Tuple2.create rules (ws *> updates) |> exec ~consume:Prefix
 
 let () = run_with_input_file ~part1 ~part2 ~parse
