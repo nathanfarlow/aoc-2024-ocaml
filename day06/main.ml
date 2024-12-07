@@ -1,29 +1,68 @@
 open! Core
 open! Common
 
-module Pos = struct
+module Point = struct
   type t = int * int
 
   include Tuple.Comparable (Int) (Int)
+end
+
+module Loc = struct
+  module T = struct
+    type t = { i : int; j : int; dx : int; dy : int } [@@deriving compare, sexp]
+  end
+
+  include T
+  include Comparable.Make (T)
 end
 
 let find_guard =
   Array.find_mapi_exn ~f:(fun i ->
       Array.find_mapi ~f:(fun j -> function `Guard -> Some (i, j) | _ -> None))
 
-let part1 grid =
-  let rec step (i, j) (dy, dx) visited =
-    let visited = Set.add visited (i, j) in
-    let f_i, f_j = (i + dy, j + dx) in
-    match Array.get_opt grid f_i >>= fun row -> Array.get_opt row f_j with
-    | None -> visited
-    | Some (`Empty | `Guard) -> step (f_i, f_j) (dy, dx) visited
-    | Some `Obstacle -> step (i, j) (dx, -dy) visited
-  in
-  step (find_guard grid) (-1, 0) (Set.empty (module Pos))
-  |> Set.length |> print_int
+let get_opt i j grid = Array.get_opt grid i >>= fun row -> Array.get_opt row j
 
-let part2 _ = failwith ""
+let simulate grid =
+  let rec step loc visited =
+    match Set.mem visited loc with
+    | true -> `Cycle
+    | false -> (
+        let visited = Set.add visited loc in
+        let forward = Loc.{ loc with i = loc.i + loc.dy; j = loc.j + loc.dx } in
+        match get_opt forward.i forward.j grid with
+        | None ->
+            let unique_positions =
+              Set.map (module Point) visited ~f:(fun { i; j; _ } -> (i, j))
+            in
+            `Off_edge unique_positions
+        | Some (`Empty | `Guard) -> step forward visited
+        | Some `Obstacle ->
+            let rotate = Loc.{ loc with dx = -loc.dy; dy = loc.dx } in
+            step rotate visited)
+  in
+  let i, j = find_guard grid in
+  step Loc.{ i; j; dy = -1; dx = 0 } (Set.empty (module Loc))
+
+let part1 grid =
+  match simulate grid with
+  | `Off_edge visited -> Set.length visited |> print_int
+
+let part2 grid =
+  let num = ref 0 in
+  for i = 0 to Array.length grid - 1 do
+    for j = 0 to Array.length grid.(0) - 1 do
+      let prev = grid.(i).(j) in
+      match prev with
+      | `Empty ->
+          (grid.(i).(j) <- `Obstacle;
+           match simulate grid with
+           | `Cycle -> num := !num + 1
+           | `Off_edge _ -> ());
+          grid.(i).(j) <- prev
+      | _ -> ()
+    done
+  done;
+  print_int !num
 
 let parse =
   let open Angstrom in

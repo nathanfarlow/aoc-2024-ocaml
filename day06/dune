@@ -1,5 +1,5 @@
 (executable
  (name main)
  (libraries common angstrom)
- ; (flags (:standard -w -8))
+ (flags (:standard -w -8))
  (preprocess (pps ppx_jane ppx_string)))
