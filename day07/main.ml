@@ -19,9 +19,9 @@ let part2 =
 let parse =
   let open Angstrom in
   let line =
-    let first = integer <* string ": " in
-    let second = sep_by1 space integer in
-    lift2 Tuple2.create first second
+    let target = integer <* string ": " in
+    let values = sep_by1 space integer in
+    lift2 Tuple2.create target values
   in
   sep_by1 end_of_line line |> exec ~consume:Prefix
 
