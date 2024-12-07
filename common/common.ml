@@ -29,6 +29,14 @@ let%expect_test "zip_next" =
   zip_next [ 1; 2; 3; 4 ] |> [%sexp_of: (int * int) list] |> print_s;
   [%expect {| ((1 2) (2 3) (3 4)) |}]
 
+module Array = struct
+  include Array
+
+  let get_opt arr i =
+    if i < 0 || i >= Array.length arr then None
+    else Some (Array.unsafe_get arr i)
+end
+
 let sum ~f = List.sum (module Int) ~f
 let print_int = printf "%d\n"
 

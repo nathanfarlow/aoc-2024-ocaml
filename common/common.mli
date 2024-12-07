@@ -13,6 +13,12 @@ val ws : unit Angstrom.t
 val exec_opt :
   ?consume:Angstrom.Consume.t -> 'a Angstrom.t -> string -> 'a option
 
+module Array : sig
+  include module type of Array
+
+  val get_opt : 'a array -> int -> 'a option
+end
+
 val zip_next : 'a list -> ('a * 'a) list
 val sum : f:('a -> int) -> 'a list -> int
 val print_int : int -> unit
