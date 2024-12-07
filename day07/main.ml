@@ -1,28 +1,20 @@
 open! Core
 open! Common
 
-let part1 =
+let go ops =
   let rec valid ~value ~target = function
     | [] -> value = target
     | x :: xs ->
-        valid ~value:(value + x) ~target xs
-        || valid ~value:(value * x) ~target xs
+        List.exists ops ~f:(fun op -> valid ~value:(op value x) ~target xs)
   in
   List.filter ~f:(fun (target, values) -> valid ~value:0 ~target values)
   >> sum ~f:fst >> print_int
 
+let part1 = go [ ( + ); ( * ) ]
+
 let part2 =
-  let rec valid ~value ~target = function
-    | [] -> value = target
-    | x :: xs ->
-        valid ~value:(value + x) ~target xs
-        || valid ~value:(value * x) ~target xs
-        || valid
-             ~value:Int.(of_string (to_string value ^ to_string x))
-             ~target xs
-  in
-  List.filter ~f:(fun (target, values) -> valid ~value:0 ~target values)
-  >> sum ~f:fst >> print_int
+  let ( || ) a b = Int.of_string (sprintf "%d%d" a b) in
+  go [ ( + ); ( * ); ( || ) ]
 
 let parse =
   let open Angstrom in
