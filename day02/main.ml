@@ -32,5 +32,5 @@ module Part2 = struct
     |> sum ~f:Bool.to_int |> print_int
 end
 
-let parse = many (many_till (integer <* space) eol) |> exec
+let parse = many (many_till (integer <* space) end_of_line) |> exec
 let () = run_with_input_file ~part1:Part1.f ~part2:Part2.f ~parse

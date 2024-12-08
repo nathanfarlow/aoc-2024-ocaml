@@ -14,14 +14,13 @@ let find_antennas grid =
 let go ~start ~end_ grid =
   let antennas = find_antennas grid in
   let locs = Hash_set.create (module Point) in
-  Hashtbl.iter antennas ~f:(fun l ->
-      Sequence.iter (triangular l) ~f:(fun ((y1, x1), tl) ->
-          List.iter tl ~f:(fun (y2, x2) ->
-              for i = start to end_ do
-                let dy, dx = (i * (y2 - y1), i * (x2 - x1)) in
-                Hash_set.add locs (y1 - dy, x1 - dx);
-                Hash_set.add locs (y2 + dy, x2 + dx)
-              done)));
+  Hashtbl.iter antennas ~f:(fun antennas ->
+      Sequence.iter (all_pairs antennas) ~f:(fun ((y1, x1), (y2, x2)) ->
+          for i = start to end_ do
+            let dy, dx = (i * (y2 - y1), i * (x2 - x1)) in
+            Hash_set.add locs (y1 - dy, x1 - dx);
+            Hash_set.add locs (y2 + dy, x2 + dx)
+          done));
   let locs = Hash_set.to_list locs |> List.filter ~f:(Grid.in_bounds grid) in
   List.length locs |> print_int
 

@@ -20,8 +20,6 @@ let find_guard =
   Array.find_mapi_exn ~f:(fun i ->
       Array.find_mapi ~f:(fun j -> function `Guard -> Some (i, j) | _ -> None))
 
-let get_opt i j grid = Array.get_opt grid i >>= fun row -> Array.get_opt row j
-
 let simulate grid =
   let rec step loc visited =
     match Set.mem visited loc with
@@ -29,7 +27,7 @@ let simulate grid =
     | false -> (
         let visited = Set.add visited loc in
         let forward = Loc.{ loc with i = loc.i + loc.dy; j = loc.j + loc.dx } in
-        match get_opt forward.i forward.j grid with
+        match Grid.get_opt grid (forward.i, forward.j) with
         | None ->
             let unique_positions =
               Set.map (module Point) visited ~f:(fun { i; j; _ } -> (i, j))

@@ -31,11 +31,14 @@ let part2 (rules, updates) =
 let parse =
   let open Angstrom in
   let rules =
-    sep_by1 eol (sep_by1 (char '|') integer >>| function [ a; b ] -> (a, b))
+    sep_by1 end_of_line
+      (sep_by1 (char '|') integer >>| function [ a; b ] -> (a, b))
     >>| Map.of_alist_multi (module Int)
     >>| Map.map ~f:(Set.of_list (module Int))
   in
-  let updates = sep_by1 eol (sep_by1 (char ',') integer >>| Array.of_list) in
+  let updates =
+    sep_by1 end_of_line (sep_by1 (char ',') integer >>| Array.of_list)
+  in
   lift2 Tuple2.create rules (ws *> updates) |> exec ~consume:Prefix
 
 let () = run_with_input_file ~part1 ~part2 ~parse

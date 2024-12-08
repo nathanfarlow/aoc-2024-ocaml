@@ -1,40 +1,59 @@
 open! Core
 module Math = Math
-include module type of Option.Let_syntax
+module Grid = Grid
+module Point = Point
 
-val ( >> ) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c
-val space : unit Angstrom.t
-val integer : int Angstrom.t
-val eol : unit Angstrom.t
-val skip_till : 'a Angstrom.t -> 'a Angstrom.t
-val exec : ?consume:Angstrom.Consume.t -> 'a Angstrom.t -> string -> 'a
-val ws : unit Angstrom.t
+module Syntax : sig
+  include module type of Option.Let_syntax
 
-val exec_opt :
-  ?consume:Angstrom.Consume.t -> 'a Angstrom.t -> string -> 'a option
-
-module Array : sig
-  include module type of Array
-
-  val get_opt : 'a array -> int -> 'a option
+  val ( >> ) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c
 end
 
-module Point : sig
-  type t = int * int [@@deriving compare, hash, sexp]
-end
+include module type of Syntax
 
-module Grid : sig
-  type 'a t = 'a array array
+module Angstrom : sig
+  include module type of Angstrom
 
-  val height : 'a t -> int
-  val width : 'a t -> int
-  val in_bounds : 'a t -> Point.t -> bool
-  val get : 'a t -> Point.t -> 'a
-  val get_opt : 'a t -> Point.t -> 'a option
+  val space : unit t
+  (** Space or tab *)
+
+  val integer : int t
+
+  val skip_till : 'a t -> 'a t
+  (** Skip all characters until we encounter the given parser. *)
+
+  val ws : unit t
+  (** Skips [Char.is_whitespace] *)
+
+  val exec : ?consume:Consume.t -> 'a t -> string -> 'a
+  val exec_opt : ?consume:Consume.t -> 'a t -> string -> 'a option
 end
 
 val triangular : 'a list -> ('a * 'a list) Sequence.t
+(** A functional replacement for
+    {v
+       for i in range(len(l)):
+        for j in range(i + 1, len(l)):
+          yield i, l[j:]
+    v}
+*)
+
+val all_pairs : 'a list -> ('a * 'a) Sequence.t
+(** A functional replacement for
+    {v
+      for i in range(len(l)):
+        for j in range(i + 1, len(l)):
+          yield l[i], l[j]
+    v}
+ *)
+
 val zip_next : 'a list -> ('a * 'a) list
+(** A functional replacement for
+    {v
+      zip(l, l[1:])
+    v}
+ *)
+
 val sum : f:('a -> int) -> 'a list -> int
 val print_int : int -> unit
 

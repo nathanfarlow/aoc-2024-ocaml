@@ -21,6 +21,6 @@ let part2 [ l1; l2 ] =
   |> printf "%d\n"
 
 let parse =
-  many (many_till (integer <* space) eol) >>| List.transpose_exn |> exec
+  many (many_till (integer <* space) end_of_line) >>| List.transpose_exn |> exec
 
 let () = run_with_input_file ~part1 ~part2 ~parse

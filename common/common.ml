@@ -1,22 +1,32 @@
 open! Core
 module Math = Math
-include Option.Let_syntax
-open Angstrom
+module Grid = Grid
+module Point = Point
 
-let ( >> ) f g x = g (f x)
-let space = skip_while (function ' ' | '\t' -> true | _ -> false)
-let integer = take_while1 Char.is_digit >>| Int.of_string
-let eol = string "\n" >>| ignore
+module Syntax = struct
+  include Option.Let_syntax
 
-let exec ?(consume = Angstrom.Consume.All) parser s =
-  parse_string ~consume parser s |> Result.ok_or_failwith
+  let ( >> ) f g x = g (f x)
+end
 
-let ws = skip_while Char.is_whitespace
+include Syntax
 
-let exec_opt ?consume parser s =
-  match exec ?consume parser s with x -> Some x | exception _ -> None
+module Angstrom = struct
+  include Angstrom
 
-let skip_till p = fix (fun m -> p <|> any_char *> m)
+  let space = skip_while (function ' ' | '\t' -> true | _ -> false)
+  let integer = take_while1 Char.is_digit >>| Int.of_string
+
+  let exec ?(consume = Angstrom.Consume.All) parser s =
+    parse_string ~consume parser s |> Result.ok_or_failwith
+
+  let ws = skip_while Char.is_whitespace
+
+  let exec_opt ?consume parser s =
+    match exec ?consume parser s with x -> Some x | exception _ -> None
+
+  let skip_till p = fix (fun m -> p <|> any_char *> m)
+end
 
 let zip_next l =
   let rec aux acc = function
@@ -29,33 +39,8 @@ let%expect_test "zip_next" =
   zip_next [ 1; 2; 3; 4 ] |> [%sexp_of: (int * int) list] |> print_s;
   [%expect {| ((1 2) (2 3) (3 4)) |}]
 
-module Array = struct
-  include Array
-
-  let get_opt arr i =
-    if i < 0 || i >= Array.length arr then None
-    else Some (Array.unsafe_get arr i)
-end
-
 let sum ~f = List.sum (module Int) ~f
 let print_int = printf "%d\n"
-
-module Point = struct
-  type t = int * int
-
-  include Tuple.Comparable (Int) (Int)
-  include Tuple.Hashable (Int) (Int)
-end
-
-module Grid = struct
-  type 'a t = 'a array array
-
-  let height = Array.length
-  let width t = Array.length t.(0)
-  let get t (i, j) = t.(i).(j)
-  let in_bounds t (i, j) = i >= 0 && i < height t && j >= 0 && j < width t
-  let get_opt t (i, j) = if in_bounds t (i, j) then Some t.(i).(j) else None
-end
 
 let triangular l =
   let open Sequence.Generator in
@@ -64,6 +49,14 @@ let triangular l =
     | x :: xs -> yield (x, xs) >>= fun () -> aux xs
   in
   run (aux l)
+
+let all_pairs l =
+  Sequence.concat_map (triangular l) ~f:(fun (x, xs) ->
+      Sequence.of_list (List.map xs ~f:(fun y -> (x, y))))
+
+let%expect_test "all_pairs" =
+  all_pairs [ 1; 2; 3 ] |> [%sexp_of: (int * int) Sequence.t] |> print_s;
+  [%expect {| ((1 2) (1 3) (2 3)) |}]
 
 let run_with_input_file ~part1 ~part2 ~parse =
   Command.basic ~summary:"Advent of code"
