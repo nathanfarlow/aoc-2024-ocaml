@@ -11,19 +11,22 @@ let find_antennas grid =
             Hashtbl.set letters ~key:cell ~data:((i, j) :: locs)));
   letters
 
-let part1 grid =
+let go ~start ~end_ grid =
   let antennas = find_antennas grid in
   let locs = Hash_set.create (module Point) in
   Hashtbl.iter antennas ~f:(fun l ->
       Sequence.iter (triangular l) ~f:(fun ((y1, x1), tl) ->
           List.iter tl ~f:(fun (y2, x2) ->
-              let dy, dx = (y2 - y1, x2 - x1) in
-              Hash_set.add locs (y1 - dy, x1 - dx);
-              Hash_set.add locs (y2 + dy, x2 + dx))));
+              for i = start to end_ do
+                let dy, dx = (i * (y2 - y1), i * (x2 - x1)) in
+                Hash_set.add locs (y1 - dy, x1 - dx);
+                Hash_set.add locs (y2 + dy, x2 + dx)
+              done)));
   let locs = Hash_set.to_list locs |> List.filter ~f:(Grid.in_bounds grid) in
   List.length locs |> print_int
 
-let part2 _ = ()
+let part1 = go ~start:1 ~end_:1
+let part2 grid = go ~start:0 ~end_:(Grid.width grid + Grid.height grid) grid
 
 let parse =
   let open Angstrom in
