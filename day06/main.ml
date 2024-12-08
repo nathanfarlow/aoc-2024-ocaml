@@ -1,12 +1,6 @@
 open! Core
 open! Common
 
-module Point = struct
-  type t = int * int
-
-  include Tuple.Comparable (Int) (Int)
-end
-
 module Loc = struct
   module T = struct
     type t = { i : int; j : int; dx : int; dy : int } [@@deriving compare, sexp]

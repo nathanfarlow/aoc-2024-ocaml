@@ -2,4 +2,6 @@
 
 open! Core
 
-type t = int * int [@@deriving compare, hash, sexp]
+type t = int * int [@@deriving hash, sexp]
+
+include Comparable.S with type t := t
