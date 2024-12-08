@@ -30,7 +30,7 @@ module Angstrom : sig
 end
 
 val triangular : 'a list -> ('a * 'a list) Sequence.t
-(** A functional replacement for
+(** Equivalent to
     {v
        for i in range(len(l)):
         for j in range(i + 1, len(l)):
@@ -39,7 +39,7 @@ val triangular : 'a list -> ('a * 'a list) Sequence.t
 *)
 
 val all_pairs : 'a list -> ('a * 'a) Sequence.t
-(** A functional replacement for
+(** Equivalent to
     {v
       for i in range(len(l)):
         for j in range(i + 1, len(l)):
@@ -48,9 +48,9 @@ val all_pairs : 'a list -> ('a * 'a) Sequence.t
  *)
 
 val zip_next : 'a list -> ('a * 'a) list
-(** A functional replacement for
+(** Equivalent to
     {v
-      zip(l, l[1:])
+      list(zip(l, l[1:]))
     v}
  *)
 
