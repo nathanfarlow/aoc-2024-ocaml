@@ -37,7 +37,13 @@ let zip_next l =
 
 let%expect_test "zip_next" =
   zip_next [ 1; 2; 3; 4 ] |> [%sexp_of: (int * int) list] |> print_s;
-  [%expect {| ((1 2) (2 3) (3 4)) |}]
+  [%expect {| ((1 2) (2 3) (3 4)) |}];
+  zip_next [ 1; 2 ] |> [%sexp_of: (int * int) list] |> print_s;
+  [%expect {| ((1 2)) |}];
+  zip_next [ 1 ] |> [%sexp_of: (int * int) list] |> print_s;
+  [%expect {| () |}];
+  zip_next [] |> [%sexp_of: (int * int) list] |> print_s;
+  [%expect {| () |}]
 
 let sum ~f = List.sum (module Int) ~f
 let print_int = printf "%d\n"
@@ -56,7 +62,13 @@ let all_pairs l =
 
 let%expect_test "all_pairs" =
   all_pairs [ 1; 2; 3 ] |> [%sexp_of: (int * int) Sequence.t] |> print_s;
-  [%expect {| ((1 2) (1 3) (2 3)) |}]
+  [%expect {| ((1 2) (1 3) (2 3)) |}];
+  all_pairs [ 1; 2 ] |> [%sexp_of: (int * int) Sequence.t] |> print_s;
+  [%expect {| ((1 2)) |}];
+  all_pairs [ 1 ] |> [%sexp_of: (int * int) Sequence.t] |> print_s;
+  [%expect {| () |}];
+  all_pairs [] |> [%sexp_of: (int * int) Sequence.t] |> print_s;
+  [%expect {| () |}]
 
 let run_with_input_file ~part1 ~part2 ~parse =
   Command.basic ~summary:"Advent of code"
