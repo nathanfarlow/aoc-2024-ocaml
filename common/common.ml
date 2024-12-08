@@ -40,6 +40,31 @@ end
 let sum ~f = List.sum (module Int) ~f
 let print_int = printf "%d\n"
 
+module Point = struct
+  type t = int * int
+
+  include Tuple.Comparable (Int) (Int)
+  include Tuple.Hashable (Int) (Int)
+end
+
+module Grid = struct
+  type 'a t = 'a array array
+
+  let height = Array.length
+  let width t = Array.length t.(0)
+  let get t (i, j) = t.(i).(j)
+  let in_bounds t (i, j) = i >= 0 && i < height t && j >= 0 && j < width t
+  let get_opt t (i, j) = if in_bounds t (i, j) then Some t.(i).(j) else None
+end
+
+let triangular l =
+  let open Sequence.Generator in
+  let rec aux = function
+    | [] -> return ()
+    | x :: xs -> yield (x, xs) >>= fun () -> aux xs
+  in
+  run (aux l)
+
 let run_with_input_file ~part1 ~part2 ~parse =
   Command.basic ~summary:"Advent of code"
     (let%map_open.Command f =

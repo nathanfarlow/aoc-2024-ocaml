@@ -19,6 +19,21 @@ module Array : sig
   val get_opt : 'a array -> int -> 'a option
 end
 
+module Point : sig
+  type t = int * int [@@deriving compare, hash, sexp]
+end
+
+module Grid : sig
+  type 'a t = 'a array array
+
+  val height : 'a t -> int
+  val width : 'a t -> int
+  val in_bounds : 'a t -> Point.t -> bool
+  val get : 'a t -> Point.t -> 'a
+  val get_opt : 'a t -> Point.t -> 'a option
+end
+
+val triangular : 'a list -> ('a * 'a list) Sequence.t
 val zip_next : 'a list -> ('a * 'a) list
 val sum : f:('a -> int) -> 'a list -> int
 val print_int : int -> unit
