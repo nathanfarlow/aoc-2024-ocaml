@@ -14,8 +14,8 @@ let find_antennas grid =
 let go ~start ~end_ grid =
   let antennas = find_antennas grid in
   let locs = Hash_set.create (module Point) in
-  Hashtbl.iter antennas ~f:(fun antennas ->
-      Sequence.iter (all_pairs antennas) ~f:(fun ((y1, x1), (y2, x2)) ->
+  Hashtbl.iter antennas ~f:(fun antenna_group ->
+      Sequence.iter (all_pairs antenna_group) ~f:(fun ((y1, x1), (y2, x2)) ->
           for i = start to end_ do
             let dy, dx = (i * (y2 - y1), i * (x2 - x1)) in
             Hash_set.add locs (y1 - dy, x1 - dx);
