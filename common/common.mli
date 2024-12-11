@@ -17,6 +17,9 @@ module Angstrom : sig
   val space : unit t
   (** Space or tab *)
 
+  val digit : int t
+  (** 0 through 9 *)
+
   val integer : int t
 
   val skip_till : 'a t -> 'a t

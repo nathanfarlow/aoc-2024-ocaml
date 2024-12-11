@@ -26,6 +26,7 @@ module Angstrom = struct
     match exec ?consume parser s with x -> Some x | exception _ -> None
 
   let skip_till p = fix (fun m -> p <|> any_char *> m)
+  let digit = satisfy Char.is_digit >>| Char.to_string >>| Int.of_string
 end
 
 let zip_next l =
