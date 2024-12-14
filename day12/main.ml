@@ -67,11 +67,15 @@ let part2 grid =
     let visit pos =
       [ (0, 1); (1, 0); (0, -1); (-1, 0) ]
       |> List.iter ~f:(fun dir ->
-             if Hash_set.mem visited { Key.pos; dir } then ()
-             else if is_side region pos dir then (
-               incr answer;
-               mark pos dir))
+             match
+               (is_side region pos dir, Hash_set.mem visited { Key.pos; dir })
+             with
+             | true, false ->
+                 incr answer;
+                 mark pos dir
+             | _ -> ())
     in
+
     Set.iter region ~f:visit;
     !answer
   in
