@@ -48,7 +48,6 @@ let swap (a, b) = (b, a)
 let is_side region pos dir = not (Set.mem region (add pos dir))
 
 let part2 grid =
-  let regions = regions grid in
   let num_sides region =
     let visited = Hash_set.create (module Key) in
     let rec mark pos dir =
@@ -74,7 +73,9 @@ let part2 grid =
     Set.iter region ~f:visit;
     !answer
   in
-  sum regions ~f:(fun region -> area region * num_sides region) |> print_int
+  regions grid
+  |> sum ~f:(fun region -> area region * num_sides region)
+  |> print_int
 
 let parse =
   let open Angstrom in
