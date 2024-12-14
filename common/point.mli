@@ -4,5 +4,11 @@ open! Core
 
 type t = int * int [@@deriving hash, sexp]
 
+module O : sig
+  val ( + ) : t -> t -> t
+  val ( - ) : t -> t -> t
+  val ( * ) : t -> t -> t
+end
+
 include Comparable.S with type t := t
 include Hashable.S with type t := t
