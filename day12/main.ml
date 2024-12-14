@@ -51,15 +51,17 @@ let part2 grid =
   let num_sides region =
     let visited = Hash_set.create (module Key) in
     let rec mark pos dir =
-      if Hash_set.mem visited { Key.pos; dir } then ()
-      else
-        match (Set.mem region pos, Set.mem region (add pos dir)) with
-        | true, false ->
-            Hash_set.add visited { Key.pos; dir };
-            let swapped = swap dir in
-            mark (add pos swapped) dir;
-            mark (add pos (neg swapped)) dir
-        | _ -> ()
+      match
+        ( Hash_set.mem visited { Key.pos; dir },
+          Set.mem region pos,
+          Set.mem region (add pos dir) )
+      with
+      | false, true, false ->
+          Hash_set.add visited { Key.pos; dir };
+          let swapped = swap dir in
+          mark (add pos swapped) dir;
+          mark (add pos (neg swapped)) dir
+      | _ -> ()
     in
     let answer = ref 0 in
     let visit pos =
