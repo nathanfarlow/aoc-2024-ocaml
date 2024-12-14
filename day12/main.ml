@@ -75,7 +75,6 @@ let part2 grid =
                  mark pos dir
              | _ -> ())
     in
-
     Set.iter region ~f:visit;
     !answer
   in
