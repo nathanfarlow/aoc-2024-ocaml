@@ -9,3 +9,5 @@ val width : 'a t -> int
 val in_bounds : 'a t -> Point.t -> bool
 val get : 'a t -> Point.t -> 'a
 val get_opt : 'a t -> Point.t -> 'a option
+val neighbors : 'a t -> Point.t -> (Point.t * 'a) list
+val find_all : equal:('a -> 'b -> bool) -> 'a t -> 'b -> Point.t list
