@@ -34,12 +34,7 @@ let part1 grid =
   |> print_int
 
 module Key = struct
-  module T = struct
-    type t = { pos : Point.t; dir : Point.t } [@@deriving compare, hash, sexp]
-  end
-
-  include T
-  include Comparable.Make (T)
+  type t = { pos : Point.t; dir : Point.t } [@@deriving compare, hash, sexp]
 end
 
 let add (a, b) (c, d) = (a + c, b + d)
