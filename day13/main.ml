@@ -7,14 +7,14 @@ let solve =
   let x = Lp.var ~integer:true "x" in
   let y = Lp.var ~integer:true "y" in
   fun { a; b; prize } ->
-    let as_floats = Tuple2.map ~f:Float.of_int in
+    let open Lp in
+    let as_floats = Tuple2.map ~f:(Float.of_int >> c) in
     let ax, ay = as_floats a in
     let bx, by = as_floats b in
     let px, py = as_floats prize in
-    let open Lp in
     let obj = minimize ((c 3. *~ x) ++ y) in
-    let c0 = (c ax *~ x) ++ (c bx *~ y) =~ c px in
-    let c1 = (c ay *~ x) ++ (c by *~ y) =~ c py in
+    let c0 = (ax *~ x) ++ (bx *~ y) =~ px in
+    let c1 = (ay *~ x) ++ (by *~ y) =~ py in
     make obj [ c0; c1 ] |> Lp_glpk.solve ~term_output:false |> function
     | Ok (_, xs) -> Some PMap.(find x xs, find y xs)
     | Error _ -> None
