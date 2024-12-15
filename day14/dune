@@ -1,0 +1,4 @@
+(executable
+ (name main)
+ (libraries common angstrom lp lp-glpk)
+ (preprocess (pps ppx_jane ppx_string)))

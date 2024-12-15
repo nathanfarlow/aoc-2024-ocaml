@@ -15,7 +15,11 @@ module Angstrom = struct
   include Angstrom
 
   let space = skip_while (function ' ' | '\t' -> true | _ -> false)
-  let integer = take_while1 Char.is_digit >>| Int.of_string
+
+  let integer =
+    let open Angstrom.Let_syntax in
+    let%bind mul = option 1 (char '-' >>| fun _ -> -1) in
+    take_while1 Char.is_digit >>| Int.of_string >>| ( * ) mul
 
   let exec ?(consume = Angstrom.Consume.All) parser s =
     parse_string ~consume parser s |> Result.ok_or_failwith
