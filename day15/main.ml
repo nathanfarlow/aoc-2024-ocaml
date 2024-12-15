@@ -61,40 +61,41 @@ module Part2 = struct
   let f input =
     let open Entry2 in
     let grid = make_grid input.grid in
-    let rec can_push pos dir =
+    let rec push pos dir =
       let next_pos = Point.O.(pos + dir_to_point dir) in
       let is_vert =
         match dir with Up | Down -> true | Left | Right -> false
       in
-      match Grid.get grid next_pos with
-      | Wall -> false
-      | Empty | Robot -> true
-      | Left_box when is_vert ->
-          let right_box = Point.O.(next_pos + (0, 1)) in
-          can_push right_box dir && can_push next_pos dir
-      | Right_box when is_vert ->
-          let left_box = Point.O.(next_pos + (0, -1)) in
-          can_push left_box dir && can_push next_pos dir
-      | _ -> can_push next_pos dir
-    in
-    let rec push pos dir =
-      let next_pos = Point.O.(pos + dir_to_point dir) in
-      (match Grid.get grid next_pos with
-      | Empty | Robot | Wall -> ()
-      | Left_box ->
-          let right_box = Point.O.(next_pos + (0, 1)) in
-          push right_box dir;
-          push next_pos dir
-      | Right_box ->
-          let left_box = Point.O.(next_pos + (0, -1)) in
-          push left_box dir;
-          push next_pos dir);
-      Grid.set grid next_pos (Grid.get grid pos);
-      Grid.set grid pos Empty
+      let both f1 f2 =
+        Option.both f1 f2 >>| fun (f1, f2) () ->
+        f1 ();
+        f2 ()
+      in
+      let continuation =
+        match Grid.get grid next_pos with
+        | Wall -> None
+        | Empty | Robot -> Some (fun () -> ())
+        | Left_box when is_vert ->
+            let right_box = Point.O.(next_pos + (0, 1)) in
+            both (push right_box dir) (push next_pos dir)
+        | Right_box when is_vert ->
+            let left_box = Point.O.(next_pos + (0, -1)) in
+            both (push left_box dir) (push next_pos dir)
+        | Left_box | Right_box -> push next_pos dir
+      in
+      both continuation
+        (Some
+           (fun () ->
+             (* JANK! *)
+             match Grid.get grid next_pos with
+             | Empty ->
+                 Grid.set grid next_pos (Grid.get grid pos);
+                 Grid.set grid pos Empty
+             | _ -> ()))
     in
     List.iter input.instructions ~f:(fun dir ->
         let start_pos = Grid.find_exn ~equal:Entry2.equal grid Robot in
-        if can_push start_pos dir then push start_pos dir |> ignore);
+        push start_pos dir |> Option.iter ~f:(fun f -> f ()));
     score grid |> print_int
 end
 
