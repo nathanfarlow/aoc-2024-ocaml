@@ -2,7 +2,7 @@
 
 open! Core
 
-type 'a t = 'a array array
+type 'a t = 'a array array [@@deriving sexp_of]
 
 val height : 'a t -> int
 val width : 'a t -> int

@@ -1,0 +1,4 @@
+(executable
+ (name main)
+ (libraries common angstrom ocamlgraph)
+ (preprocess (pps ppx_jane ppx_string)))

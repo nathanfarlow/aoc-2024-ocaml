@@ -12,3 +12,8 @@ end
 
 include Comparable.S with type t := t
 include Hashable.S with type t := t
+
+val up : t
+val down : t
+val left : t
+val right : t

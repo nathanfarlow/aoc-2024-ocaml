@@ -11,3 +11,8 @@ end
 
 include Tuple.Comparable (Int) (Int)
 include Tuple.Hashable (Int) (Int)
+
+let up = (-1, 0)
+let down = (1, 0)
+let left = (0, -1)
+let right = (0, 1)

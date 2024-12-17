@@ -1,6 +1,6 @@
 open! Core
 
-type 'a t = 'a array array
+type 'a t = 'a array array [@@deriving sexp_of]
 
 let height = Array.length
 let width t = Array.length t.(0)
